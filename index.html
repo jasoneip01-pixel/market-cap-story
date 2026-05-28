@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>十年巨变 · 市值之书</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #1a1a2e;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Georgia', 'Noto Serif SC', serif;
+    overflow: hidden;
+    user-select: none;
+    background-image:
+      radial-gradient(ellipse at 20% 50%, #16213e 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 50%, #16213e 0%, transparent 50%);
+  }
+
+  /* ========== BOOK ========== */
+  .book-wrapper {
+    perspective: 2500px;
+    width: 100%;
+    max-width: 900px;
+    height: 100vh;
+    max-height: 650px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+
+  .book {
+    display: flex;
+    width: 800px;
+    height: 560px;
+    position: relative;
+    transform-style: preserve-3d;
+  }
+
+  /* Spine visual */
+  .book::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 12px;
+    height: 100%;
+    background: linear-gradient(to right, #2a1a0a, #3d2817, #2a1a0a);
+    transform: translateX(-50%);
+    z-index: 100;
+    border-radius: 2px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  }
+
+  /* ========== PAGES ========== */
+  .page {
+    position: absolute;
+    width: 400px;
+    height: 100%;
+    top: 0;
+    transform-origin: left center;
+    transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1);
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    cursor: pointer;
+  }
+
+  .page.open {
+    transform: perspective(1600px) rotateY(-175deg);
+    pointer-events: none;
+  }
+  .page.open + .page-right {
+    z-index: 60;
+  }
+
+  .page:nth-child(odd) {
+    z-index: 50;
+  }
+
+  /* Both sides of each page */
+  .page-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    backface-visibility: hidden;
+    border-radius: 2px;
+    padding: 40px 36px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .page-front {
+    background: linear-gradient(135deg, #fefaf5 0%, #f5ece0 100%);
+    z-index: 2;
+    box-shadow: -2px 0 8px rgba(0,0,0,0.1), 2px 0 8px rgba(0,0,0,0.1);
+    border: 1px solid #e8dcc8;
+  }
+
+  .page-back {
+    background: linear-gradient(135deg, #f5ece0 0%, #fefaf5 100%);
+    transform: rotateY(180deg);
+    box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+    border: 1px solid #e8dcc8;
+  }
+
+  /* Page stack order */
+  .page { z-index: auto; }
+  .page[data-index="0"] { z-index: 50; }
+  .page[data-index="1"] { z-index: 49; }
+  .page[data-index="2"] { z-index: 48; }
+  .page[data-index="3"] { z-index: 47; }
+  .page[data-index="4"] { z-index: 46; }
+  .page[data-index="5"] { z-index: 45; }
+  .page[data-index="6"] { z-index: 44; }
+  .page[data-index="7"] { z-index: 43; }
+
+  /* ========== TYPOGRAPHY ========== */
+  .page-number {
+    position: absolute;
+    bottom: 20px;
+    right: 36px;
+    font-size: 13px;
+    color: #b8a88a;
+    font-style: italic;
+    letter-spacing: 1px;
+  }
+  .page-back .page-number {
+    right: auto;
+    left: 36px;
+  }
+
+  .hint {
+    position: absolute;
+    bottom: 20px;
+    left: 36px;
+    font-size: 12px;
+    color: #c4b69a;
+    letter-spacing: 0.5px;
+  }
+  .page-back .hint {
+    left: auto;
+    right: 36px;
+  }
+
+  h1 {
+    font-size: 28px;
+    color: #2c1810;
+    letter-spacing: 4px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-size: 20px;
+    color: #4a3020;
+    letter-spacing: 2px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  h3 {
+    font-size: 15px;
+    color: #8b7355;
+    letter-spacing: 3px;
+    font-weight: 400;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  p {
+    font-size: 14px;
+    line-height: 1.8;
+    color: #3d2b1a;
+    margin-bottom: 12px;
+    text-align: justify;
+  }
+  .highlight {
+    color: #c0392b;
+    font-weight: 700;
+  }
+  .highlight-blue {
+    color: #2471a3;
+    font-weight: 700;
+  }
+  .highlight-green {
+    color: #1e8449;
+    font-weight: 700;
+  }
+  .highlight-gold {
+    color: #b7950b;
+    font-weight: 700;
+  }
+
+  /* ========== COVER ========== */
+  .cover-page {
+    background: linear-gradient(135deg, #1a0f0a 0%, #2c1810 50%, #1a0f0a 100%);
+    border: 2px solid #5a3a20;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  .cover-page h1 {
+    color: #d4a84b;
+    font-size: 34px;
+    letter-spacing: 8px;
+    margin-bottom: 16px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+  .cover-page .subtitle {
+    color: #b8a88a;
+    font-size: 14px;
+    letter-spacing: 6px;
+    margin-bottom: 30px;
+  }
+  .cover-page .ornament {
+    font-size: 24px;
+    color: #d4a84b;
+    margin-bottom: 20px;
+  }
+  .cover-page .author-line {
+    color: #8b7355;
+    font-size: 12px;
+    letter-spacing: 3px;
+  }
+  .cover-page .tap-hint {
+    color: #6a5a3a;
+    font-size: 13px;
+    margin-top: 30px;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+
+  /* ========== DATA VIS ========== */
+  .height-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 200px;
+    margin: 16px 0;
+    padding-bottom: 20px;
+    position: relative;
+  }
+  .height-chart .bar-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: flex-end;
+    position: relative;
+  }
+  .height-chart .bar {
+    width: 100%;
+    max-width: 60px;
+    border-radius: 4px 4px 0 0;
+    position: relative;
+    min-height: 8px;
+    transition: all 0.3s;
+  }
+  .height-chart .bar-label {
+    position: absolute;
+    bottom: -22px;
+    font-size: 10px;
+    white-space: nowrap;
+    color: #5a4a3a;
+    font-weight: 600;
+  }
+  .height-chart .bar-value {
+    position: absolute;
+    top: -18px;
+    font-size: 10px;
+    color: #888;
+    font-weight: 600;
+  }
+  .height-chart .y-axis {
+    position: absolute;
+    left: -8px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    border-left: 1px solid #ddd;
+  }
+  .height-chart .y-label {
+    position: absolute;
+    left: -38px;
+    font-size: 9px;
+    color: #aaa;
+  }
+
+  /* Person-figures for the chart */
+  .person-group {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 2px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+  .person {
+    width: 18px;
+    background: #8b7355;
+    border-radius: 9px 9px 0 0;
+    position: relative;
+    transition: all 0.3s;
+  }
+  .person::before {
+    content: '';
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: inherit;
+  }
+  .person-small {
+    width: 12px;
+  }
+  .person-tiny {
+    width: 8px;
+  }
+
+  .comparison-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 8px 0;
+    padding: 8px 12px;
+    border-radius: 6px;
+    background: rgba(139,115,85,0.06);
+  }
+  .comparison-row .label {
+    font-size: 13px;
+    color: #5a4a3a;
+    min-width: 70px;
+  }
+  .comparison-row .value {
+    font-size: 15px;
+    font-weight: 700;
+  }
+  .comparison-row .arrow {
+    color: #b8a88a;
+    font-size: 18px;
+  }
+
+  /* ========== QUOTE ========== */
+  blockquote {
+    border-left: 3px solid #d4a84b;
+    padding: 12px 16px;
+    margin: 12px 0;
+    font-style: italic;
+    color: #5a4a3a;
+    background: rgba(212,168,75,0.06);
+    border-radius: 0 6px 6px 0;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  /* ========== TIMELINE DOT ========== */
+  .timeline-dots {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin: 20px 0;
+    position: relative;
+  }
+  .timeline-dots::before {
+    content: '';
+    position: absolute;
+    top: 6px;
+    left: 15%;
+    right: 15%;
+    height: 2px;
+    background: #ddd;
+  }
+  .timeline-dot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+    z-index: 1;
+  }
+  .timeline-dot .circle {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #d4a84b;
+    border: 2px solid #f5ece0;
+  }
+  .timeline-dot .year {
+    font-size: 11px;
+    color: #8b7355;
+    font-weight: 600;
+  }
+
+  /* ========== INSIGHT BOX ========== */
+  .insight-box {
+    background: rgba(212,168,75,0.08);
+    border: 1px solid rgba(212,168,75,0.2);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 10px 0;
+  }
+  .insight-box .label {
+    font-size: 11px;
+    color: #b7950b;
+    letter-spacing: 2px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .insight-box p {
+    font-size: 13px;
+    margin-bottom: 0;
+  }
+
+  /* ========== RATIO DISPLAY ========== */
+  .ratio-vis {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 14px 0;
+    padding: 12px;
+    background: rgba(192,57,43,0.04);
+    border-radius: 8px;
+  }
+  .ratio-vis .who {
+    font-size: 13px;
+    color: #5a4a3a;
+    min-width: 70px;
+  }
+  .ratio-vis .bar-track {
+    flex: 1;
+    height: 20px;
+    background: #eee;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+  }
+  .ratio-vis .bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.5s;
+  }
+  .ratio-vis .bar-text {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px;
+    color: #fff;
+    font-weight: 700;
+  }
+
+  /* ========== NAVIGATION ========== */
+  .nav-arrows {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 20px;
+    z-index: 200;
+  }
+  .nav-arrow {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(212,168,75,0.3);
+    color: #d4a84b;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    backdrop-filter: blur(8px);
+  }
+  .nav-arrow:hover {
+    background: rgba(212,168,75,0.2);
+    border-color: #d4a84b;
+  }
+  .nav-arrow:disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+  }
+
+  .page-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #6a5a3a;
+    font-size: 13px;
+    letter-spacing: 1px;
+  }
+  .page-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #6a5a3a;
+    opacity: 0.2;
+    transition: all 0.3s;
+  }
+  .page-dot.active {
+    opacity: 0.8;
+    width: 18px;
+    border-radius: 3px;
+    background: #d4a84b;
+  }
+
+  /* ========== RESPONSIVE ========== */
+
+  /* Large desktop (1200px+) */
+  @media (min-width: 1200px) {
+    .book-wrapper { max-width: 1100px; }
+    .book { width: 960px; height: 620px; }
+    .page-face { padding: 48px 44px; }
+    h1 { font-size: 32px; }
+    h2 { font-size: 22px; }
+    p { font-size: 15px; line-height: 1.9; }
+    .cover-page h1 { font-size: 40px; letter-spacing: 10px; }
+    .height-chart { height: 230px; }
+  }
+
+  /* Tablet & small laptop (769-1199px) */
+  @media (max-width: 1199px) and (min-width: 769px) {
+    .book { width: 90vw; height: 66vw; max-height: 560px; max-width: 880px; }
+    .page-face { padding: 32px 30px; }
+    h1 { font-size: 26px; }
+    h2 { font-size: 18px; }
+    p { font-size: 13px; line-height: 1.8; }
+    .cover-page h1 { font-size: 30px; letter-spacing: 6px; }
+    .height-chart { height: 160px; }
+    .insight-box { padding: 10px 12px; }
+  }
+
+  /* Large phone & portrait tablet (481-768px) */
+  @media (max-width: 768px) {
+    body { justify-content: flex-start; padding-top: 10px; }
+    .book-wrapper { height: auto; max-height: none; padding: 0; }
+    .book { width: 96vw; height: 78vw; min-height: 300px; max-height: 480px; margin: 0 auto; }
+    .page { width: 50%; }
+    .page-face { padding: 18px 14px; }
+    h1 { font-size: 20px; letter-spacing: 3px; }
+    h2 { font-size: 15px; margin-bottom: 8px; }
+    h3 { font-size: 12px; margin-bottom: 10px; letter-spacing: 2px; }
+    p { font-size: 11px; line-height: 1.6; margin-bottom: 8px; }
+    .cover-page h1 { font-size: 22px; letter-spacing: 4px; }
+    .cover-page .subtitle { font-size: 11px; letter-spacing: 4px; margin-bottom: 16px; }
+    .height-chart { height: 110px; margin: 10px 0; }
+    .bar-container .bar-value { font-size: 8px; top: -14px; }
+    .bar-container .bar-label { font-size: 8px; bottom: -16px; }
+    .insight-box { padding: 8px 10px; margin: 6px 0; }
+    .insight-box p { font-size: 10px; }
+    .ratio-vis { flex-direction: column; gap: 6px; padding: 8px; margin: 8px 0; }
+    .ratio-vis .who { font-size: 11px; min-width: 60px; }
+    blockquote { padding: 8px 10px; margin: 8px 0; font-size: 11px; }
+    .comparison-row { padding: 5px 8px; margin: 4px 0; gap: 6px; }
+    .comparison-row .label { font-size: 11px; min-width: 50px; }
+    .comparison-row .value { font-size: 12px; }
+    .timeline-dots { gap: 20px; margin: 12px 0; }
+    .timeline-dot .circle { width: 10px; height: 10px; }
+    .timeline-dot .year { font-size: 9px; }
+    .page-number { font-size: 9px; bottom: 10px; right: 14px; }
+    .hint { font-size: 8px; bottom: 10px; left: 14px; }
+    .page-back .page-number { right: auto; left: 14px; }
+    .page-back .hint { left: auto; right: 14px; }
+    .nav-arrows { bottom: 10px; gap: 10px; padding: 0 10px; }
+    .nav-arrow { width: 32px; height: 32px; font-size: 13px; }
+    .page-indicator { gap: 4px; }
+    .page-dot { width: 4px; height: 4px; }
+    .page-dot.active { width: 12px; }
+    .cover-page .tap-hint { font-size: 10px; margin-top: 14px; }
+    .cover-page .ornament { font-size: 16px; margin-bottom: 10px; }
+    .cover-page .author-line { font-size: 10px; }
+  }
+
+  /* Small phone (< 481px) — ultra compact */
+  @media (max-width: 480px) {
+    .book-wrapper { padding: 0; }
+    .book { width: 98vw; height: 85vw; min-height: 260px; max-height: 400px; }
+    .page-face { padding: 12px 10px; }
+    h1 { font-size: 16px; letter-spacing: 2px; }
+    h2 { font-size: 13px; margin-bottom: 6px; }
+    h3 { font-size: 10px; margin-bottom: 6px; }
+    p { font-size: 10px; line-height: 1.5; margin-bottom: 6px; }
+    .cover-page h1 { font-size: 18px; letter-spacing: 3px; }
+    .cover-page .subtitle { font-size: 10px; letter-spacing: 3px; margin-bottom: 10px; }
+    .height-chart { height: 80px; margin: 6px 0; }
+    .bar-container .bar-value { font-size: 7px; top: -12px; }
+    .bar-container .bar-label { font-size: 7px; bottom: -14px; }
+    .insight-box { padding: 6px 8px; margin: 4px 0; border-radius: 4px; }
+    .insight-box .label { font-size: 9px; }
+    .insight-box p { font-size: 9px; }
+    .ratio-vis { padding: 6px; margin: 4px 0; gap: 4px; }
+    .ratio-vis .who { font-size: 10px; min-width: 50px; }
+    .ratio-vis .bar-track { height: 14px; }
+    blockquote { padding: 6px 8px; margin: 6px 0; font-size: 10px; border-left-width: 2px; }
+    .comparison-row { padding: 4px 6px; margin: 3px 0; }
+    .comparison-row .label { font-size: 10px; min-width: 40px; }
+    .comparison-row .value { font-size: 11px; }
+    .timeline-dots { gap: 12px; margin: 8px 0; }
+    .page-number { font-size: 8px; bottom: 6px; right: 10px; }
+    .hint { font-size: 7px; bottom: 6px; left: 10px; }
+    .page-back .page-number { left: 10px; }
+    .page-back .hint { right: 10px; }
+    .nav-arrows { bottom: 6px; gap: 6px; }
+    .nav-arrow { width: 28px; height: 28px; font-size: 11px; }
+    .page-indicator { gap: 3px; }
+    .page-dot { width: 3px; height: 3px; }
+    .page-dot.active { width: 10px; }
+    .cover-page .tap-hint { font-size: 9px; margin-top: 10px; }
+    .cover-page .ornament { font-size: 12px; margin-bottom: 6px; }
+  }
+
+  /* Landscape phone — wider but shorter */
+  @media (max-height: 450px) and (orientation: landscape) {
+    .book-wrapper { height: 88vh; }
+    .book { height: 82vh; max-height: 400px; }
+    .page-face { padding: 10px 14px; }
+    h1 { font-size: 16px; }
+    .cover-page h1 { font-size: 18px; }
+    h2 { font-size: 12px; margin-bottom: 4px; }
+    h3 { font-size: 9px; margin-bottom: 4px; }
+    p { font-size: 9px; line-height: 1.4; margin-bottom: 4px; }
+    .height-chart { height: 70px; margin: 4px 0; }
+    .page-number { bottom: 4px; right: 10px; }
+    .hint { bottom: 4px; left: 10px; }
+    .nav-arrows { bottom: 2px; }
+    .nav-arrow { width: 24px; height: 24px; font-size: 10px; }
+    blockquote { padding: 4px 6px; margin: 4px 0; font-size: 9px; }
+    .insight-box { padding: 4px 6px; margin: 3px 0; }
+    .insight-box p { font-size: 8px; }
+    .ratio-vis { padding: 4px; margin: 3px 0; }
+    .timeline-dots { gap: 10px; margin: 4px 0; }
+  }
+
+  /* Tablet landscape — prevent squishing */
+  @media (min-width: 768px) and (max-height: 600px) {
+    .book { height: 85vh; max-height: 480px; }
+    .page-face { padding: 20px 24px; }
+    p { font-size: 12px; line-height: 1.6; }
+    .height-chart { height: 100px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="book-wrapper">
+  <div class="book" id="book">
+
+    <!-- ========== PAGE 0: COVER ========== -->
+    <div class="page" data-index="0">
+      <div class="page-face cover-page">
+        <div class="ornament">✦ ✦ ✦</div>
+        <h1>十年巨变</h1>
+        <div class="subtitle">市 值 的 故 事</div>
+        <div class="ornament">✦</div>
+        <p style="color:#b8a88a; font-size:14px; line-height:2; margin-top:20px;">
+          2015 — 2026<br>
+          中国概念股 × 全球科技巨头
+        </p>
+        <div class="ornament" style="margin-top:20px;">✦ ✦ ✦</div>
+        <div class="author-line">— 一张信息图里的十年 —</div>
+        <div class="tap-hint">👆 点击翻页</div>
+      </div>
+    </div>
+
+    <!-- ========== PAGE 1: 2015 全景 ========== -->
+    <div class="page" data-index="1">
+      <div class="page-face page-front">
+        <h3>第一章 · 2015</h3>
+        <h2>十年前的风景</h2>
+        <p>
+          如果把市值画成人的身高，2015年的世界长这样——
+        </p>
+        <div class="height-chart">
+          <div style="position:absolute; left:0; right:0; top:0; bottom:0; display:flex; align-items:flex-end; gap:4px;">
+            <div class="bar-container">
+              <span class="bar-value">~1.5T</span>
+              <div class="bar" style="height:100%; background:linear-gradient(to top, #8e44ad, #9b59b6);"></div>
+              <span class="bar-label">Apple + MS + Google</span>
+            </div>
+            <div class="bar-container">
+              <span class="bar-value">~1.5T</span>
+              <div class="bar" style="height:85%; background:linear-gradient(to top, #2471a3, #3498db);"></div>
+              <span class="bar-label">中概集团</span>
+            </div>
+            <div class="bar-container">
+              <span class="bar-value">150B</span>
+              <div class="bar" style="height:10%; background:linear-gradient(to top, #1e8449, #27ae60);"></div>
+              <span class="bar-label">NVIDIA</span>
+            </div>
+            <div class="bar-container">
+              <span class="bar-value">100B</span>
+              <div class="bar" style="height:7%; background:linear-gradient(to top, #c0392b, #e74c3c);"></div>
+              <span class="bar-label">TSMC</span>
+            </div>
+            <div class="bar-container">
+              <span class="bar-value">~4B</span>
+              <div class="bar" style="height:1%; background:linear-gradient(to top, #b7950b, #f1c40f);"></div>
+              <span class="bar-label">Bitcoin</span>
+            </div>
+          </div>
+        </div>
+        <p>
+          苹果、微软、谷歌三座大山，并肩托起~1.5万亿的市值。
+          中概股集团同样估值~1.5万亿——但由几十家挤在一起的公司堆成，
+          <span class="highlight-blue">人数多，个子矮</span>。
+        </p>
+        <div class="insight-box">
+          <div class="label">💡 时代叙事</div>
+          <p><strong>"人多力量大"</strong>——中概股的黄金叙事。个体虽小，合起来就是一方势力。</p>
+        </div>
+        <div class="page-number">6</div>
+        <div class="hint">翻页继续 →</div>
+      </div>
+    </div>
+
+    <!-- ========== PAGE 1 BACK: 2015 细看 ========== -->
+    <div class="page" data-index="2">
+      <div class="page-face page-back">
+        <h3>第一章 · 2015</h3>
+        <h2>一个不起眼的注脚</h2>
+        <div class="ratio-vis">
+          <span class="who">NVIDIA vs 中概</span>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:10%; background:#27ae60;">
+              <span class="bar-text">1 : 10</span>
+            </div>
+          </div>
+        </div>
+        <p>
+          英伟达当时市值约 <span class="highlight-green">150B</span>——只是中概集团的 <span class="highlight-green">十分之一</span>。
+          台积电约 <span class="highlight-red">100B</span>，比特币还不到 <span class="highlight-gold">4B</span>，在图的底部几乎看不见。
+        </p>
+        <p>
+          2015年的世界，属于 <strong>移动互联网</strong>。苹果的iPhone刚刚定义了一个时代，
+          中国的互联网公司正在高速奔跑。没有人会想到——此时跑得最快的那些公司，
+          十年后许多已经消失在了前排。
+        </p>
+        <blockquote>
+          "颍川从我者皆逝，而子独留，始验疾风知劲草。"
+          —— 但古人没告诉你，风来的时候，
+          有些劲草会被连根拔起，有些不起眼的小草会长成参天大树。
+        </blockquote>
+        <div class="page-number">5</div>
+        <div class="hint">← 翻回 / 继续 →</div>
+      </div>
+    </div>
+
+    <!-- ========== PAGE 2: 2021 ========== -->
+    <div class="page" data-index="3">
+      <div class="page-face page-front">
+        <h3>第二章 · 2021</h3>
+        <h2>五年后的转折</h2>
+        <div class="height-chart">
+          <div style="position:absolute; left:0; right:0; top:0; bottom:0; display:flex; align-items:flex-end; gap:4px;">
+            <div class="bar-container">
+              <span class="bar-value">~2T</span>
+              <div class="bar" style="height:100%; background:linear-gradient(to top, #8e44ad, #9b59b6);"></div>
+              <span class="bar-label">Apple</span>
+            </div>
+            <div class="bar-container">
+              <span class="bar-value">~2.5T(峰值)</span>
+              <div class="bar" style="height:90%; background:linear-gradient(to top, #2471a3, #3498db);"></div>
+              <span class="bar-label">中概(峰值)</span>
+            </div>
+            <div class="bar-container">
+              <span class="bar-value">500B</span>
+              <div class="bar" style="height:25%; background:linear-gradient(to top, #c0392b, #e74c3c);"></div>
+              <span class="bar-label">TSMC</span>
+            </div>
+            <div class="bar-container">
+              <span class="bar-value">250B</span>
+              <div class="bar" style="height:12%; background:linear-gradient(to top, #1e8449, #27ae60);"></div>
+              <span class="bar-label">NVIDIA</span>
+            </div>
+          </div>
+        </div>
+        <p>
+          苹果突破 <span class="highlight">2T$</span>，成为绝对巨无霸。
+          中概集团到过 <span class="highlight-blue">2.5T$</span> 的峰值——但那是顶点。
+        </p>
+        <p>
+          <span class="highlight-green">台积电</span> 第一次站到了苹果旁边，市值 ~500B。
+          芯片开始不再是"附属品"。
+        </p>
+        <div class="insight-box">
+          <div class="label">⚡ 技术转向</div>
+          <p><strong>移动互联网 → 移动 + 芯片</strong>。台积电的崛起预示着一件事：算力正在变得值钱。</p>
+        </div>
+        <div class="page-number">8</div>
+        <div class="hint">翻页继续 →</div>
+      </div>
+    </div>
+
+    <!-- ========== PAGE 2 BACK: 2021 细看 ========== -->
+    <div class="page" data-index="4">
+      <div class="page-face page-back">
+        <h3>第二章 · 2021</h3>
+        <h2>峰顶的回声</h2>
+        <p>
+          中概在2021年达到了历史顶峰——2.5万亿美元。五年间涨了 <strong>1.7倍</strong>。
+          无数人相信：这只是起点。
+        </p>
+        <p>
+          但如果你仔细看那张图——<strong>个体已经开始坍缩</strong>。
+          人数减少了，人均身高变矮了。总量涨是因为少数几家撑住了，
+          多数公司已经在走下坡路。
+        </p>
+        <p>
+          与此同时，<span class="highlight-green">NVIDIA</span> 从150B涨到250B——"才100亿的增长"。
+          在那个遍地十倍股的时代，没人觉得这有什么特别。
+        </p>
+        <div class="comparison-row">
+          <span class="label">2015 中概</span>
+          <span class="arrow">→</span>
+          <span class="value highlight-blue">1.5T</span>
+        </div>
+        <div class="comparison-row">
+          <span class="label">2021 中概(峰值)</span>
+          <span class="arrow">→</span>
+          <span class="value highlight-blue">2.5T (+67%)</span>
+        </div>
+        <div class="comparison-row">
+          <span class="label">NVIDIA</span>
+          <span class="arrow">→</span>
+          <span class="value highlight-green">250B (+67%)</span>
+        </div>
+        <p style="margin-top:8px; font-size:12px; color:#8b7355;">
+          倍率一样，但基数差了一个数量级。事后看，这个"一样"才是最需要警惕的信号。
+        </p>
+        <div class="page-number">7</div>
+        <div class="hint">← 翻回 / 继续 →</div>
+      </div>
+    </div>
+
+    <!-- ========== PAGE 3: 2026 ========== -->
+    <div class="page" data-index="5">
+      <div class="page-face page-front">
+        <h3>第三章 · 2026</h3>
+        <h2>现在的格局</h2>
+        <div class="height-chart">
+          <div style="position:absolute; left:0; right:0; top:0; bottom:0; display:flex; align-items:flex-end; gap:4px;">
+            <div class="bar-container">
+              <span class="bar-value">~3T+</span>
+              <div class="bar" style="height:100%; background:linear-gradient(to top, #27ae60, #2ecc71);"></div>
+              <span class="bar-label">NVIDIA</span>
+            </div>
+            <div class="bar-container">
+              <span class="bar-value">~3T+</span>
+              <div class="bar" style="height:95%; background:linear-gradient(to top, #8e44ad, #9b59b6);"></div>
+              <span class="bar-label">Apple</span>
+            </div>
+            <div class="bar-container">
+              <span class="bar-value">~1.5T</span>
+              <div class="bar" style="height:50%; background:linear-gradient(to top, #2471a3, #3498db);"></div>
+              <span class="bar-label">MS</span>
+            </div>
+            <div class="bar-container">
+              <span class="bar-value">&lt;1T</span>
+              <div class="bar" style="height:25%; background:linear-gradient(to top, #5a6a7a, #7f8c8d);"></div>
+              <span class="bar-label">中概集团</span>
+            </div>
+          </div>
+        </div>
+        <p class="highlight" style="font-size:16px; text-align:center; margin:8px 0;">
+          格局完全翻转。
+        </p>
+        <p>
+          <span class="highlight-green">NVIDIA ~3T+</span>，与Apple并驾齐驱。
+          十年从150B到3T+——<span class="highlight-green">20倍增长</span>。
+        </p>
+        <p>
+          中概集团回到 <span class="highlight-blue">&lt;1T</span>——跟2015年几乎一样。
+          十年兜兜转转，回到原点。
+        </p>
+        <div class="page-number">10</div>
+        <div class="hint">翻页继续 →</div>
+      </div>
+    </div>
+
+    <!-- ========== PAGE 3 BACK: 2026 细看 ========== -->
+    <div class="page" data-index="6">
+      <div class="page-face page-back">
+        <h3>第三章 · 2026</h3>
+        <h2>1 : 1 的翻转</h2>
+
+        <div class="ratio-vis">
+          <span class="who">2015: NVIDIA vs 中概</span>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:10%; background:#27ae60;">
+              <span class="bar-text">1 : 10</span>
+            </div>
+          </div>
+        </div>
+        <div class="ratio-vis">
+          <span class="who">2026: NVIDIA vs 中概</span>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:100%; background:#1e8449;">
+              <span class="bar-text">1 : 1</span>
+            </div>
+          </div>
+        </div>
+
+        <p style="margin-top:12px;">
+          当年NVIDIA只是中概的 <strong>十分之一</strong>。
+          今天 <span class="highlight-green">NVIDIA一个人</span> 等于整个中概集团。
+        </p>
+        <div class="insight-box">
+          <div class="label">🔍 核心翻转</div>
+          <p>
+            "1/10" → "1:1"。NVIDIA从一个标签变成了标签本身。
+            中概从集团军变成了注脚。
+          </p>
+        </div>
+        <p style="margin-top:8px; font-size:13px; color:#5a4a3a;">
+          150B → 3T+: 20倍。<br>
+          1.5T → 峰值2.5T → &lt;1T: ±0。
+        </p>
+        <div class="page-number">9</div>
+        <div class="hint">← 翻回 / 继续 →</div>
+      </div>
+    </div>
+
+    <!-- ========== PAGE 4: 底层叙事 ========== -->
+    <div class="page" data-index="7">
+      <div class="page-face page-front">
+        <h3>终章</h3>
+        <h2>技术周期的更替</h2>
+
+        <div class="timeline-dots">
+          <div class="timeline-dot">
+            <div class="circle"></div>
+            <span class="year">2015</span>
+            <span style="font-size:9px; color:#8b7355;">Mobile</span>
+          </div>
+          <div class="timeline-dot">
+            <div class="circle"></div>
+            <span class="year">2021</span>
+            <span style="font-size:9px; color:#8b7355;">Mobile+Chip</span>
+          </div>
+          <div class="timeline-dot">
+            <div class="circle"></div>
+            <span class="year">2026</span>
+            <span style="font-size:9px; color:#8b7355;">AI Era</span>
+          </div>
+        </div>
+
+        <p>
+          这张图讲了三个时间切片，背后是三个技术时代：
+        </p>
+        <p>
+          <strong>2015 · 移动互联网时代</strong><br>
+          苹果定义硬件，Google定义搜索，中国公司定义本土市场。
+        </p>
+        <p>
+          <strong>2021 · 移动+芯片</strong><br>
+          台积电第一次站到苹果旁边——世界开始意识到：<em>造芯片的和造手机的一样重要</em>。
+        </p>
+        <p>
+          <strong>2026 · AI算力时代</strong><br>
+          NVIDIA登顶。算力不是附加值——<span class="highlight-green">算力就是核心产品本身</span>。
+        </p>
+        <div class="page-number">12</div>
+        <div class="hint">翻页继续 →</div>
+      </div>
+    </div>
+
+    <!-- ========== PAGE 4 BACK: 感悟 ========== -->
+    <div class="page" data-index="8">
+      <div class="page-face page-back">
+        <h3>终章</h3>
+        <h2>趋势的翻转</h2>
+        <blockquote>
+          "趋势的翻转从来不是渐变的。<br>
+          它只是在你没注意的时候，<br>
+          一个人站到了所有人上面。"
+        </blockquote>
+        <p>
+          十年是一段不长不短的时间。
+        </p>
+        <p>
+          长到可以让一个"小公司"涨20倍成为世界第一。
+          短到可以让一个集团军兜兜转转回到原点。
+        </p>
+        <p>
+          那张图的残酷之处不在于NVIDIA涨了多少——
+          而在于中概集团的曲线，画了一个十年的圆。
+        </p>
+        <div class="insight-box">
+          <div class="label">✨ 真正的能力</div>
+          <p>
+            不是跟紧一个浪潮——是在浪潮还只是涟漪的时候，<br>
+            认出它和上一个浪潮不是同一个东西。
+          </p>
+        </div>
+        <div class="page-number">11</div>
+        <div class="hint">← 翻回</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Navigation -->
+<div class="nav-arrows" id="nav">
+  <button class="nav-arrow" id="prevBtn" disabled>◀</button>
+  <div class="page-indicator" id="indicator"></div>
+  <button class="nav-arrow" id="nextBtn">▶</button>
+</div>
+
+<script>
+(function() {
+  const book = document.getElementById('book');
+  const pages = Array.from(document.querySelectorAll('.page'));
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const indicator = document.getElementById('indicator');
+
+  // Each page has front (left side) and back (right side)
+  // Index i controls page i (left half of spread)
+  // The book shows left side of open pages on left, right side on right
+  let currentSpread = 0; // Which page pair is turned
+  const totalSpreads = Math.ceil(pages.length / 2);
+
+  // A page is "open" (turned) when its index < currentSpread
+  // Pages are left-side pages (0-indexed)
+  function render() {
+    pages.forEach((page, i) => {
+      if (i < currentSpread) {
+        page.classList.add('open');
+        page.style.pointerEvents = 'none';
+      } else {
+        page.classList.remove('open');
+        page.style.pointerEvents = '';
+      }
+      // Stack order: lower index = higher z-index when open
+      page.style.zIndex = pages.length - i;
+    });
+
+    // Buttons
+    prevBtn.disabled = currentSpread <= 0;
+    nextBtn.disabled = currentSpread >= totalSpreads - 1;
+
+    // Indicator
+    let dots = '';
+    for (let i = 0; i < totalSpreads; i++) {
+      const active = i === currentSpread ? ' active' : '';
+      dots += `<span class="page-dot${active}"></span>`;
+    }
+    indicator.innerHTML = dots;
+  }
+
+  function nextPage() {
+    if (currentSpread < totalSpreads - 1) {
+      currentSpread++;
+      render();
+    }
+  }
+
+  function prevPage() {
+    if (currentSpread > 0) {
+      currentSpread--;
+      render();
+    }
+  }
+
+  // Click on book to turn
+  book.addEventListener('click', (e) => {
+    // If clicked on right half, go forward; left half, go backward
+    const rect = book.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    if (x > rect.width / 2) {
+      nextPage();
+    } else {
+      prevPage();
+    }
+  });
+
+  // Tap on open page (right side) to advance
+  document.querySelectorAll('.page.open + .page .page-front, .page.open + .page .page-back').forEach(el => {
+    el.addEventListener('click', (e) => e.stopPropagation());
+  });
+
+  // Keyboard
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'f') {
+      e.preventDefault();
+      nextPage();
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      prevPage();
+    }
+  });
+
+  // Touch swipe
+  let touchStartX = 0;
+  book.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  });
+  book.addEventListener('touchend', (e) => {
+    const diff = e.changedTouches[0].screenX - touchStartX;
+    if (diff < -50) nextPage();
+    if (diff > 50) prevPage();
+  });
+
+  prevBtn.addEventListener('click', (e) => { e.stopPropagation(); prevPage(); });
+  nextBtn.addEventListener('click', (e) => { e.stopPropagation(); nextPage(); });
+
+  render();
+})();
+</script>
+</body>
+</html>
