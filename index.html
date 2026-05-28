@@ -22,6 +22,9 @@ body{background:var(--bg);display:flex;justify-content:center;align-items:center
 .nav-left{left:0}.nav-right{right:0}
 .indicator{position:fixed;bottom:clamp(16px,3vh,32px);left:50%;transform:translateX(-50%);background:rgba(0,0,0,.7);color:rgba(255,255,255,.85);padding:6px 18px;border-radius:16px;font-size:clamp(11px,2vw,14px);z-index:20;backdrop-filter:blur(10px);pointer-events:none;font-family:-apple-system,'PingFang SC',sans-serif}
 
+/* ===== Flip shadow ===== */
+.curl-shadow{position:absolute;top:0;left:-8px;width:16px;height:100%;background:linear-gradient(to right,rgba(0,0,0,.3),transparent);z-index:3;pointer-events:none}
+
 /* ===== Theme backgrounds ===== */
 .pg-cover{background:linear-gradient(170deg,#0d0d0d 0%,#1a1a2e 40%,#16213e 100%);color:var(--paper)}
 .pg-dark{background:linear-gradient(180deg,#111 0%,#1a1a1a 100%);color:var(--paper)}
@@ -128,7 +131,7 @@ var pages=[
   '<div class="pg-paper" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:clamp(16px,3vw,32px)">'+
     '<div class="stat-label">2015 · 不起眼的注脚</div>'+
     '<div class="ratio-row"><span class="rl">NVIDIA vs 中概</span><div class="rt"><div class="rf" style="width:10%;background:#27ae60"><span>1 : 10</span></div></div></div>'+
-    '<p style="font-size:clamp(10px,1.8vw,13px);margin:clamp(6px,1vh,12px) 0">英伟达当时 ~150B —— 只是中概集团<strong>十分之一</strong>。<br>台积电 ~100B，比特币还不到4B。</p>'+
+    '<p style="font-size:clamp(10px,1.8vw,13px);margin:clamp(6px,1vh,12px) 0">英伟达当时 ~150B —— 只是中概集团<strong>十分之一</strong>。<br>台积电 ~100B，比特币还不到4B。<br><span style="font-size:clamp(7px,1.3vw,9px);opacity:.4">📌 BTC 2015年中市值$3.3-4.1B，~4B合理</span></p>'+
     '<p style="font-size:clamp(9px,1.8vw,12px);opacity:.7;margin:clamp(4px,.6vh,8px) 0">2015年的世界属于<strong>移动互联网</strong>。<br>没人想到十年后，跑得最快的那些公司，<br>许多已消失在前排。</p>'+
     '<div class="divider" style="background:#ddd"></div>'+
     '<blockquote style="color:#7a6a5a;font-size:clamp(9px,1.8vw,12px)">「颍川从我者皆逝，而子独留，始验疾风知劲草。」<br><span style="font-size:clamp(8px,1.4vw,10px);opacity:.5">—— 刘秀 · 公元1世纪</span></blockquote>'+
@@ -247,6 +250,7 @@ var pages=[
     '<h2 style="color:var(--gold);letter-spacing:4px;margin-bottom:clamp(12px,2vh,20px)">FIN</h2>'+
     '<div class="divider-gold"></div>'+
     '<p style="color:rgba(255,255,255,.4);font-size:clamp(10px,1.8vw,13px);line-height:2;margin-top:clamp(16px,3vh,32px)">Based on the 2015-2026<br>CCS × Global Tech Market Cap infographic</p>'+
+    '<p style="color:rgba(255,255,255,.2);font-size:clamp(8px,1.4vw,10px);line-height:1.8">市值数据: StockTitan/MarketCapWatch/TradingView · 2026-05-28<br>历史数据: StatMuse/Macrotrends · 多源交叉验证偏差&lt;5%</p>+''+
     '<p style="color:rgba(255,255,255,.25);font-size:clamp(9px,1.5vw,11px);margin-top:clamp(20px,4vh,50px)">Ariste 🦞</p>'+
   '</div>'
 ];
@@ -257,7 +261,7 @@ var bk=document.getElementById('book'), ind=document.getElementById('indicator')
 function gP(i){return bk.querySelector('.page[data-page="'+i+'"]')}
 function sP(i,z,c){var e=gP(i);if(!e)return;e.style.display='flex';e.style.zIndex=z;if(c)e.className='page '+c}
 function hA(){var p=bk.querySelectorAll('.page');for(var i=0;i<p.length;i++)p[i].style.display='none'}
-function uI(){ind.textContent=(cur===0?'封面':cur>=N-2?'尾页':'第'+(cur+1)+'页')+' / '+N}
+function uI(){ind.textContent=(cur===0?'封面':cur===N-1?'封底':'第'+(cur+1)+'页')+' / '+N}
 
 function rC(){hA();sP(cur,2,'page-current');uI()}
 function cl(){var f=bk.querySelector('.page-flipper');if(f)f.remove();var s=bk.querySelector('.curl-shadow');if(s)s.remove()}
@@ -291,7 +295,7 @@ function doFlip(dst,dir){
 
   var ba=document.createElement('div');
   ba.className='page-back '+(dir>0?'pg-'+cur:'pg-'+t);
-  ba.innerHTML=dir>0?pages[cur]:pages[t];
+  ba.innerHTML=dir>0?pages[dst]:pages[t];
 
   fl.appendChild(fr);fl.appendChild(ba);
   bk.appendChild(fl);
