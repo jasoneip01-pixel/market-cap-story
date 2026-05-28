@@ -12,7 +12,7 @@ body{background:var(--bg);display:flex;justify-content:center;align-items:center
 .book-shadow{position:absolute;bottom:-10px;left:6%;width:88%;height:28px;background:radial-gradient(ellipse at center,rgba(0,0,0,.4) 0%,transparent 70%);filter:blur(12px);pointer-events:none;z-index:0}
 .book{position:relative;width:100%;aspect-ratio:3/4;transform-style:preserve-3d;z-index:1}
 .page{position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;border-radius:3px;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:clamp(8px,2vw,20px)}
-.page-current{z-index:2;filter:drop-shadow(0 4px 16px rgba(0,0,0,.35))}
+.page-current{z-index:2;filter:drop-shadow(0 4px 16px rgba(0,0,0,.35));animation:fadeIn 0.3s ease}
 .page-underneath{z-index:1}
 .page-flipper{position:absolute;top:0;left:0;width:100%;height:100%;z-index:4;transform-style:preserve-3d;transform-origin:left center;pointer-events:none;will-change:transform}
 .page-flipper .page-front,.page-flipper .page-back{position:absolute;top:0;left:0;width:100%;height:100%;backface-visibility:hidden;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:clamp(8px,2vw,20px)}
@@ -35,14 +35,14 @@ body{background:var(--bg);display:flex;justify-content:center;align-items:center
 
 /* ===== Typography ===== */
 h1{font-size:clamp(24px,5.5vw,38px);letter-spacing:clamp(3px,.5vw,6px);font-weight:700}
-h2{font-size:clamp(16px,3.5vw,24px);letter-spacing:2px;font-weight:600}
+h2{font-size:clamp(16px,3.5vw,24px);letter-spacing:3px;font-weight:600}
 h3{font-size:clamp(11px,2vw,14px);letter-spacing:3px;font-weight:400;text-transform:uppercase}
-.stat-label{font-size:clamp(10px,1.8vw,13px);letter-spacing:2px;opacity:.6;margin-bottom:6px}
+.stat-label{font-size:clamp(10px,1.8vw,13px);letter-spacing:3px;opacity:.55;margin-bottom:clamp(8px,1.2vh,14px)}
 .num-huge{font-size:clamp(36px,8vw,60px);font-weight:700;line-height:1.1}
-.num-large{font-size:clamp(24px,5vw,40px);font-weight:600;line-height:1.2}
+.num-large{font-size:clamp(24px,5vw,40px);font-weight:600;line-height:1.3;letter-spacing:1px}
 .sub-label{font-size:clamp(11px,2vw,14px);opacity:.7;margin-top:4px}
-p{font-size:clamp(11px,2.2vw,15px);line-height:1.8;text-align:center;max-width:86%}
-blockquote{font-size:clamp(10px,2vw,14px);font-style:italic;text-align:center;line-height:1.6;max-width:88%;margin:8px 0}
+p{font-size:clamp(11px,2.2vw,15px);line-height:1.85;text-align:center;max-width:82%;letter-spacing:0.02em}
+blockquote{font-size:clamp(10px,2vw,14px);font-style:italic;text-align:center;line-height:1.8;max-width:84%;margin:clamp(8px,1.5vh,14px) 0;letter-spacing:0.03em}
 .divider{width:40px;height:2px;margin:clamp(10px,2vh,20px) auto}
 .divider-light{width:30px;height:1px;margin:clamp(6px,1vh,12px) auto;background:rgba(255,255,255,.25)}
 .divider-gold{width:50px;height:2px;margin:clamp(10px,2vh,20px) auto;background:var(--gold)}
@@ -61,7 +61,7 @@ blockquote{font-size:clamp(10px,2vw,14px);font-style:italic;text-align:center;li
 .ratio-row .rf span{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:clamp(8px,1.4vw,10px);color:#fff;font-weight:700}
 
 .insight{width:88%;margin:clamp(6px,1vh,12px) 0;padding:clamp(8px,1.2vh,14px) clamp(10px,2vw,18px);background:rgba(201,168,76,.08);border-radius:8px;border:1px solid rgba(201,168,76,.2)}
-.insight .il{font-size:clamp(9px,1.6vw,12px);color:#b7950b;font-weight:600;letter-spacing:1px;margin-bottom:4px}
+.insight .il{font-size:clamp(9px,1.6vw,12px);color:#b7950b;font-weight:600;letter-spacing:2px;margin-bottom:6px}
 .insight p{font-size:clamp(9px,1.8vw,13px);margin:0;max-width:100%}
 
 .timeline{display:flex;justify-content:center;gap:clamp(16px,3vw,40px);width:85%;margin:clamp(10px,2vh,20px) 0;position:relative}
@@ -85,6 +85,7 @@ blockquote{font-size:clamp(10px,2vw,14px);font-style:italic;text-align:center;li
   .bar-chart{height:80px}.num-huge{font-size:clamp(28px,5vw,40px)}
   .insight{padding:4px 8px;margin:3px 0}
 }
+@keyframes fadeIn{from{opacity:0.6;transform:scale(0.98)}to{opacity:1;transform:scale(1)}}
 </style>
 </head>
 <body>
@@ -245,13 +246,18 @@ var pages=[
   '</div>',
 
   // ====== 10: BACK COVER ======
-  '<div class="pg-cover" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:clamp(20px,4vw,40px)">'+
-    '<div style="color:var(--gold);font-size:clamp(14px,2.5vw,20px);margin-bottom:clamp(16px,3vh,32px)">✦</div>'+
-    '<h2 style="color:var(--gold);letter-spacing:4px;margin-bottom:clamp(12px,2vh,20px)">FIN</h2>'+
+  '<div class="pg-cover" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:clamp(6px,1vh,14px);padding:clamp(24px,5vw,48px)">'+
+    '<div style="color:var(--gold);font-size:clamp(16px,3vw,24px);opacity:0.5">✦ ✦ ✦</div>'+
+    '<div style="flex:0.2"></div>'+
+    '<h2 style="color:var(--gold);letter-spacing:6px;font-size:clamp(28px,6vw,40px)">FIN</h2>'+
     '<div class="divider-gold"></div>'+
-    '<p style="color:rgba(255,255,255,.4);font-size:clamp(10px,1.8vw,13px);line-height:2;margin-top:clamp(16px,3vh,32px)">Based on the 2015-2026<br>CCS × Global Tech Market Cap infographic</p>'+
-    '<p style="color:rgba(255,255,255,.2);font-size:clamp(8px,1.4vw,10px);line-height:1.8">市值数据: StockTitan/MarketCapWatch/TradingView · 2026-05-28<br>历史数据: StatMuse/Macrotrends · 多源交叉验证偏差&lt;5%</p>'+
-    '<p style="color:rgba(255,255,255,.25);font-size:clamp(9px,1.5vw,11px);margin-top:clamp(20px,4vh,50px)">Ariste 🦞</p>'+
+    '<div style="flex:0.2"></div>'+
+    '<p style="color:rgba(255,255,255,.5);font-size:clamp(11px,2.2vw,15px);line-height:2">十年，一张图，<br>一个翻转的世界。</p>'+
+    '<p style="color:rgba(255,255,255,.3);font-size:clamp(9px,1.6vw,12px);line-height:1.8">2015 — 2026<br>中国概念股 × 全球科技巨头的市值故事</p>'+
+    '<div style="flex:0.3"></div>'+
+    '<p style="color:rgba(255,255,255,.18);font-size:clamp(7px,1.3vw,9px);line-height:2">市值数据: StockTitan/MarketCapWatch/TradingView · 2026-05-28<br>多源交叉验证偏差&lt;5% · BTC 2015 ~$4B 已验证</p>'+
+    '<p style="color:rgba(255,255,255,.15);font-size:clamp(9px,1.5vw,12px);margin-top:clamp(4px,.6vh,8px)">Ariste 🦞</p>'+
+    '<div style="color:var(--gold);font-size:clamp(12px,2vw,16px);opacity:0.35">✦ ✦ ✦</div>'+
   '</div>'
 ];
 
@@ -260,10 +266,9 @@ var bk=document.getElementById('book'), ind=document.getElementById('indicator')
 
 function gP(i){return bk.querySelector('.page[data-page="'+i+'"]')}
 function sP(i,z,c){var e=gP(i);if(!e)return;e.style.display='flex';e.style.zIndex=z;if(c)e.className='page '+c}
-function hA(){var p=bk.querySelectorAll('.page');for(var i=0;i<p.length;i++)p[i].style.display='none'}
 function uI(){ind.textContent=(cur===0?'封面':cur===N-1?'封底':'第'+(cur+1)+'页')+' / '+N}
 
-function rC(){hA();sP(cur,2,'page-current');uI()}
+function rC(){for(var i=0;i<N;i++){var e=gP(i);if(!e)continue;if(i===cur){e.style.display='flex';e.style.zIndex=2;e.className='page page-current'}else{e.style.display='none';e.className='page'}}uI()};
 function cl(){var f=bk.querySelector('.page-flipper');if(f)f.remove();var s=bk.querySelector('.curl-shadow');if(s)s.remove()}
 
 for(var i=0;i<N;i++){
