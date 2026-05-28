@@ -547,12 +547,13 @@
     .insight-box { padding: 10px 12px; }
   }
 
-  /* Large phone & portrait tablet (481-768px) */
+  /* Large phone & portrait tablet (481-768px) — switch to single-page view */
   @media (max-width: 768px) {
-    body { justify-content: flex-start; padding-top: 10px; }
+    body { padding-top: 10px; }
     .book-wrapper { height: auto; max-height: none; padding: 0; }
-    .book { width: 96vw; height: 78vw; min-height: 300px; max-height: 480px; margin: 0 auto; }
-    .page { width: 50%; }
+    .book { width: 80vw; max-width: 400px; height: 65vw; min-height: 320px; max-height: 480px; margin: 0 auto; position: relative; }
+    .book::before { display: none; }  /* hide spine on mobile */
+    .page { width: 100%; }
     .page-face { padding: 18px 14px; }
     h1 { font-size: 20px; letter-spacing: 3px; }
     h2 { font-size: 15px; margin-bottom: 8px; }
@@ -588,10 +589,11 @@
     .cover-page .author-line { font-size: 10px; }
   }
 
-  /* Small phone (< 481px) — ultra compact */
+  /* Small phone (< 481px) — ultra compact, single-page */
   @media (max-width: 480px) {
     .book-wrapper { padding: 0; }
-    .book { width: 98vw; height: 85vw; min-height: 260px; max-height: 400px; }
+    .book::before { display: none; }
+    .book { width: 85vw; max-width: 360px; height: 78vw; min-height: 280px; max-height: 400px; }
     .page-face { padding: 12px 10px; }
     h1 { font-size: 16px; letter-spacing: 2px; }
     h2 { font-size: 13px; margin-bottom: 6px; }
@@ -626,10 +628,12 @@
     .cover-page .ornament { font-size: 12px; margin-bottom: 6px; }
   }
 
-  /* Landscape phone — wider but shorter */
+  /* Landscape phone — wider but shorter, single-page */
   @media (max-height: 450px) and (orientation: landscape) {
     .book-wrapper { height: 88vh; }
-    .book { height: 82vh; max-height: 400px; }
+    .book::before { display: none; }
+    .book { width: 72vw; max-width: 500px; height: 82vh; max-height: 350px; }
+    .page { width: 100%; }
     .page-face { padding: 10px 14px; }
     h1 { font-size: 16px; }
     .cover-page h1 { font-size: 18px; }
@@ -992,23 +996,32 @@
           一个人站到了所有人上面。"
         </blockquote>
         <p>
-          十年是一段不长不短的时间。
-        </p>
-        <p>
-          长到可以让一个"小公司"涨20倍成为世界第一。
+          十年是一段不长不短的时间。<br>
+          长到可以让一个"小公司"涨20倍成为世界第一。<br>
           短到可以让一个集团军兜兜转转回到原点。
         </p>
-        <p>
-          那张图的残酷之处不在于NVIDIA涨了多少——
-          而在于中概集团的曲线，画了一个十年的圆。
-        </p>
+
         <div class="insight-box">
-          <div class="label">✨ 真正的能力</div>
-          <p>
-            不是跟紧一个浪潮——是在浪潮还只是涟漪的时候，<br>
-            认出它和上一个浪潮不是同一个东西。
-          </p>
+          <div class="label">🔍 第一层 · 谁赢了</div>
+          <p>NVIDIA赢了。但这不是故事的结尾——这是故事的<strong>中间点</strong>。上一个时代的大赢家（苹果、微软）并没有消失，它们和NVIDIA一起站在顶端。真正的故事是：<strong>总市值这个盘子变大了，但分蛋糕的逻辑变了</strong>——从"连接用户"变成了"提供算力"。</p>
         </div>
+
+        <div class="insight-box">
+          <div class="label">🔍 第二层 · 为什么是NVIDIA</div>
+          <p>2015年没人押注NVIDIA——因为它不性感。它不做手机，不做社交，不做电商。它做的是<strong>别人不想做的东西</strong>：图形卡、并行计算、CUDA生态。十年后，当AI需要大规模算力时，全世界才发现：<strong>只有它准备好了</strong>。这不是运气——是在没人看见的地方默默修了十年的路。</p>
+        </div>
+
+        <div class="insight-box">
+          <div class="label">🔍 第三层 · 错过的是什么</div>
+          <p>中概集团最大的问题不是不够努力——而是<strong>整个赛道变了</strong>。当全球科技从"连接人与信息"转向"连接算力与智能"时，大部分中概公司仍然在做同一件事：更好的电商、更好的社交、更好的支付。这不是战略错误——是<strong>心理模型过时了</strong>。你还在用旧地图，别人已经换了新大陆。</p>
+        </div>
+
+        <p style="margin-top:8px;font-size:12px;color:#8b7355;font-style:italic;">
+          十年间，"疾风"吹了好几次。<br>
+          每次风停之后，劲草都换了一批。<br>
+          不是风太不公平——是草自己去的地方不同。
+        </p>
+
         <div class="page-number">11</div>
         <div class="hint">← 翻回</div>
       </div>
@@ -1032,15 +1045,17 @@
   const nextBtn = document.getElementById('nextBtn');
   const indicator = document.getElementById('indicator');
 
-  // Each page has front (left side) and back (right side)
-  // Index i controls page i (left half of spread)
-  // The book shows left side of open pages on left, right side on right
-  let currentSpread = 0; // Which page pair is turned
-  const totalSpreads = Math.ceil(pages.length / 2);
+  // Mobile: single page per spread; Desktop: two-page spread
+  function isMobile() { return window.innerWidth <= 768; }
+  function getTotalSpreads() { return isMobile() ? pages.length : Math.ceil(pages.length / 2); }
+  function getPageInSpread(i) { return isMobile() ? i % 1 : Math.floor(i / 2); }
 
-  // A page is "open" (turned) when its index < currentSpread
-  // Pages are left-side pages (0-indexed)
+  let currentSpread = 0;
+  let totalSpreads = getTotalSpreads();
+
   function render() {
+    totalSpreads = getTotalSpreads();
+    if (currentSpread >= totalSpreads) currentSpread = totalSpreads - 1;
     pages.forEach((page, i) => {
       if (i < currentSpread) {
         page.classList.add('open');
@@ -1049,15 +1064,10 @@
         page.classList.remove('open');
         page.style.pointerEvents = '';
       }
-      // Stack order: lower index = higher z-index when open
       page.style.zIndex = pages.length - i;
     });
-
-    // Buttons
     prevBtn.disabled = currentSpread <= 0;
     nextBtn.disabled = currentSpread >= totalSpreads - 1;
-
-    // Indicator
     let dots = '';
     for (let i = 0; i < totalSpreads; i++) {
       const active = i === currentSpread ? ' active' : '';
@@ -1121,6 +1131,13 @@
 
   prevBtn.addEventListener('click', (e) => { e.stopPropagation(); prevPage(); });
   nextBtn.addEventListener('click', (e) => { e.stopPropagation(); nextPage(); });
+
+  // Recalculate on resize/orientation change (mobile ↔ desktop toggle)
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(render, 200);
+  });
 
   render();
 })();
